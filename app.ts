@@ -1,21 +1,22 @@
-import { Application } from "https://deno.land/x/oak/mod.ts";
+import { Application, Router, Status } from "https://deno.land/x/oak/mod.ts";
 import logger from "./middleware/logger.ts";
 import timer from "./middleware/timer.ts";
 const app = new Application();
-
+const router = new Router();
 app.use(logger);
 app.use(timer);
 
-app.use(async (ctx, next) => {
-  const start = Date.now();
-  await next();
-  const ms = Date.now() - start;
-  ctx.response.headers.set("X-Response-Time", `${ms}ms`);
+router.get("/", (ctx) => {
+  ctx.response.status = Status.OK;
+  ctx.response.type = "json";
+  ctx.response.body = {
+    status: "success",
+    message: "hello world",
+    data: null,
+  };
 });
 
-app.use((ctx) => {
-  ctx.response.body = "hello World !";
-});
+app.use(router.routes());
 
 console.log("app running -> http://localhost:3000");
 
